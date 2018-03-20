@@ -20,7 +20,7 @@
                 android:inputType="text"
                 android:maxLength="1"
                 android:textColor="@color/bg_register"
-                android:textColorLink="@color/lbl_name" />
+                android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -35,7 +35,8 @@
                 android:hint="Prénom"
                 android:inputType="text"
                 android:maxLength="1"
-                android:textColor="@color/bg_register" />
+                android:textColor="@color/bg_register"
+                android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -50,23 +51,23 @@
                 android:hint="Age"
                 android:inputType="number"
                 android:maxLength="1"
-                android:textColor="@color/bg_register" />
+                android:textColor="@color/bg_register"
+                android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:hintTextAppearance="@style/TextAppearance.AppCompat">
+
+        <Spinner
+            android:id="@+id/activite"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:hint="Activité" />
 
-            <EditText
-                android:id="@+id/genre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp"
-                android:hint="Genre"
-                android:inputType="text"
-                android:maxLength="1"
-                android:textColor="@color/bg_register" />
-        </android.support.design.widget.TextInputLayout>
+    </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -80,7 +81,8 @@
                 android:hint="Description"
                 android:inputType="text"
                 android:maxLength="3"
-                android:textColor="@color/bg_register" />
+                android:textColor="@color/bg_register"
+                android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
 
     <ProgressBar
