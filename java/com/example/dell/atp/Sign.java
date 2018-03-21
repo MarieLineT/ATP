@@ -42,6 +42,7 @@ public class Sign extends AppCompatActivity {
         //Instanciation authentification firebase
         mAuth = FirebaseAuth.getInstance();
 
+        //Connecte automatiquement sur le la page Account
         //Vérifier authentification au début de l'activitité
         if(mAuth.getCurrentUser() != null){
             startActivity(new Intent(Sign.this, Account.class));
@@ -219,14 +220,17 @@ public class Sign extends AppCompatActivity {
     }
 
     //Nouvel utilisateur
-    private void creerNouvelUtilisateur(String userId, String surnom, String email){
+    public void creerNouvelUtilisateur(String userId, String surnom, String email){
         User user = new User(surnom, email);
         mDatabase.child("users").child(userId).setValue(user);
     }
 
     //Récupérer l'Id de l'utilisateur actuel
-    public String getUid() {
+    public static String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
+
+    //Récupérer Utilisateur actuel
+    public static FirebaseUser getUser() { return FirebaseAuth.getInstance().getCurrentUser();}
 
 }
