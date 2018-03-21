@@ -57,10 +57,13 @@ public class Info extends AppCompatActivity {
                 String nom = mNom.getText().toString().trim();
                 String prenom = mPrenom.getText().toString().trim();
                 int age = mAge.getInputType();
+
                 //Récupérer actvité chosie par utilisateur
                 String activite ="";
                 if (mActivite.getSelectedItem() == "Professionnel") activite = "Professionnel";
                 if (mActivite.getSelectedItem() == "Particulier") activite = "Particulier";
+
+                //Certains champs peuvent ne pas être remplis : comment le prendre en compte ?
 
             }
         });
