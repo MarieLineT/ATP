@@ -122,7 +122,7 @@ public class Sign extends AppCompatActivity {
                                 else{
                                     //Connexion avec succès
                                     Toast.makeText(getApplicationContext(), "Identification réussie !", Toast.LENGTH_SHORT).show();
-                                    succesAuth(task.getResult().getUser());
+                                    startActivity(new Intent(Sign.this, Account.class));
                                     finish();
 
                                 }
