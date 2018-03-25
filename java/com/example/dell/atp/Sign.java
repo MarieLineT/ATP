@@ -105,6 +105,12 @@ public class Sign extends AppCompatActivity {
 
                 existeChamps(email, password);
 
+                //Afficher message si mdp trop court
+                if (password.length() < 6) {
+                    //Toast.makeText(getApplicationContext(), "Entrez au minimum 6 caractères !", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 mProgressBar.setVisibility(View.VISIBLE);
 
                 //Connexion
@@ -139,7 +145,7 @@ public class Sign extends AppCompatActivity {
 
                 //Récupération des données renseignées
                 final String email = mEmail.getText().toString().trim();
-                String password = mPassword.getText().toString().trim();
+                final String password = mPassword.getText().toString().trim();
 
                 existeChamps(email, password);
 
@@ -207,16 +213,18 @@ public class Sign extends AppCompatActivity {
 
     //Vérifier que les Text ont bien été remplis
     private void existeChamps(String email, String password){
-        if(TextUtils.isEmpty(email)) {
+
+        if(email.isEmpty()) {
             mEmail.setError("Champs requis");
             return;
         }
 
-        if(TextUtils.isEmpty(password)){
+        if(password.isEmpty()){
             mPassword.setError("Champs requis");
             return;
         }
 
+        return;
     }
 
     //Nouvel utilisateur
