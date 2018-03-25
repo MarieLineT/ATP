@@ -1,17 +1,25 @@
 package com.example.dell.atp;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,13 +27,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.example.dell.atp.Sign.getUid;
+import static com.example.dell.atp.Sign.getUser;
+
 public class Account extends AppCompatActivity {
 
     //Déclaration variables graphique
-    private Button mBtnRecherche, mBtnTchat, mBtnInfo;
+    private Button mBtnRecherche, mBtnTchat;
+    private TextView mtextViewPrenom;
+
+    //Déclarer utilisateur
+    User currentUser;
 
     //Déclaration DB
     DatabaseReference mDatabase;
+    DatabaseReference mref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +56,10 @@ public class Account extends AppCompatActivity {
         setSupportActionBar(toolbar);
         mBtnRecherche = findViewById(R.id.btn_recherche);
         mBtnTchat = findViewById(R.id.btn_tchat);
-        mBtnInfo = findViewById(R.id.btn_info);
+        mtextViewPrenom = findViewById(R.id.textViewPrenom);
 
-        //ACCEDER PAGE INFO
-        mBtnInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Start activité info
-                startActivity(new Intent(Account.this, Info.class));
-                finish();
-            }
-        });
+        //Modifier Surnom PAS DE PUTAIN D'INTERNET POUR TESTER !!!
+        defSurnom(currentUser);
 
         //ACCEDER TCHAT
         mBtnTchat.setOnClickListener(new View.OnClickListener() {
@@ -67,35 +76,67 @@ public class Account extends AppCompatActivity {
                 //Start activité recherche
             }
         });
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
-
-        /*Lire depuis la BD
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //Méthode appelée une fois avec la valeur initiale
-                //puis à chaque fois que que la donnée à cet emplacement est actualisée
-                String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "Value is : "+value);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //Echec de lecture de la donnée
-                Log.w(TAG, "Echec de lecture de la donnée.", databaseError.toException());
-
-            }
-        });*/
-
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //ajoute les entrées de menu_test à l'ActionBar
+        getMenuInflater().inflate(R.menu.menu_test, menu);
+        return true;
+    }
+
+    //Fonction Logout
+    public void logOut() {
+        new AlertDialog.Builder(this)
+                .setTitle("Quitter la session ?")
+                .setMessage("Êtes-vous sûr(e) de vouloir vous déconnecter ?")
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(Account.this, Sign.class));
+                        finish();
+                    }
+                }).create().show();
+    }
+
+    //gère le click sur une action de l'ActionBar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_rechercher:
+                //Comportement bouton rechercher
+                return true;
+            case R.id.action_logout:
+                //Comportement action logout
+                logOut();
+                return true;
+            case R.id.action_info:
+                //Comportement bouton "mes infos"
+                startActivity(new Intent(Account.this, Info.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //Définir le surnom d'affichage
+    public void defSurnom(User user){
+        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snap){
+                    currentUser = snap.getValue(User.class);
+                    if(snap.child("_prenom").exists()) {
+                        mtextViewPrenom.setText(currentUser._prenom);
+                    }
+                    else{
+                        mtextViewPrenom.setText(currentUser._surnom);
+                    }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }
