@@ -126,12 +126,15 @@ public class Account extends AppCompatActivity {
 
     //Définir le surnom d'affichage
     public void defSurnom(){
-        myRef.child("_prenom").addListenerForSingleValueEvent(new ValueEventListener() {
+
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
-                String prenom = dataSnapshot.getValue(String.class);
-                if(prenom == null) mtextViewPrenom.setText("YOU");
-                else mtextViewPrenom.setText(prenom);
+                String prenom = dataSnapshot.child("_prenom").getValue(String.class);
+                String surnom = dataSnapshot.child("_surnom").getValue(String.class);
+                if(prenom != null) mtextViewPrenom.setText(prenom);
+                else if(prenom == null) mtextViewPrenom.setText(surnom);
+                else if (surnom == null) mtextViewPrenom.setText("toi :) ");
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
