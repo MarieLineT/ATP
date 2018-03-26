@@ -36,12 +36,12 @@ public class Account extends AppCompatActivity {
     private Button mBtnRecherche, mBtnTchat;
     private TextView mtextViewPrenom;
 
-    //Déclarer utilisateur
+    //Déclarer utilisateur pour datasnapshot JE SAIS PAS COMMENT car n'EXISTE PAS POUR LE MOMENT
     User currentUser;
 
     //Déclaration DB
-    DatabaseReference mDatabase;
-    DatabaseReference mref;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,11 @@ public class Account extends AppCompatActivity {
         setContentView(R.layout.activity_account);
 
         //Instanciation BD
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users").child(getUid());
+
+        //Instanciation user
+
 
         //Référencements éléments graphiques
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -58,8 +62,8 @@ public class Account extends AppCompatActivity {
         mBtnTchat = findViewById(R.id.btn_tchat);
         mtextViewPrenom = findViewById(R.id.textViewPrenom);
 
-        //Modifier Surnom PAS DE PUTAIN D'INTERNET POUR TESTER !!!
-        defSurnom(currentUser);
+        //Modifier Surnom
+        defSurnom();
 
         //ACCEDER TCHAT
         mBtnTchat.setOnClickListener(new View.OnClickListener() {
@@ -121,21 +125,17 @@ public class Account extends AppCompatActivity {
     }
 
     //Définir le surnom d'affichage
-    public void defSurnom(User user){
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void defSurnom(){
+        myRef.child("_prenom").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snap){
-                    currentUser = snap.getValue(User.class);
-                    if(snap.child("_prenom").exists()) {
-                        mtextViewPrenom.setText(currentUser._prenom);
-                    }
-                    else{
-                        mtextViewPrenom.setText(currentUser._surnom);
-                    }
+            public void onDataChange(DataSnapshot dataSnapshot){
+                String prenom = dataSnapshot.getValue(String.class);
+                if(prenom == null) mtextViewPrenom.setText("YOU");
+                else mtextViewPrenom.setText(prenom);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                System.out.println("The read failed: " + databaseError.getCode());
             }
         });
     }
