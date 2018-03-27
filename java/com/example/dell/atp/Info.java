@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import static com.example.dell.atp.Sign.getUid;
+import static java.util.Objects.isNull;
 
 public class Info extends AppCompatActivity {
 
@@ -29,7 +31,8 @@ public class Info extends AppCompatActivity {
     private Spinner mActivite;
 
     //Déclaration DB
-    DatabaseReference mDatabase;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     private static long back_pressed;
     @Override
@@ -40,6 +43,7 @@ public class Info extends AppCompatActivity {
         else{
             Toast.makeText(getBaseContext(), "Appuyez de nouveau pour sortir", Toast.LENGTH_SHORT).show();
             back_pressed = System.currentTimeMillis();
+            startActivity(new Intent(Info.this, Account.class));
         }
     }
 
@@ -48,8 +52,9 @@ public class Info extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        //Instanciation DB
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        //Instanciation BD
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users").child(getUid());
 
         //Référencement des éléments graphiques
         mNom = findViewById(R.id.nom);
@@ -64,10 +69,20 @@ public class Info extends AppCompatActivity {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.activite_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mActivite.setAdapter(adapter);
-        //Afficher renseignement profession
-        //Pas sûre de pouvoir le mettre là
-        if (mActivite.getSelectedItem() == "Professionnel") mPro.setVisibility(View.VISIBLE);
 
+        mActivite.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                final String nouvelleActivite = (String)mActivite.getSelectedItem();
+                enregistrerDonneeString("_activite", nouvelleActivite);
+                if (nouvelleActivite != "Professionnel(le)") mPro.setVisibility(mPro.GONE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         mBtnModif.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,27 +93,20 @@ public class Info extends AppCompatActivity {
                 //Enregistrer informations utilisateurs
                 String nouveauNom = mNom.getText().toString().trim();
                 String nouveauPrenom = mPrenom.getText().toString().trim();
-                String nouvelleActivite = "";
-
-                //Récupérer actvité chosie par utilisateur
-                if (mActivite.getSelectedItem() == "Professionnel")
-                    nouvelleActivite = "Professionnel(le)";
-                else if (mActivite.getSelectedItem() == "Particulier")
-                    nouvelleActivite = "Particulier";
+                int nouvelAge = Integer.parseInt(mAge.getText().toString().trim());
 
                 //Ajouter les valeurs à la BD
                 //Certains champs peuvent ne pas être remplis : comment le prendre en compte ?
                 //Peut pas créer une seule fonction : cas par cas
                 if (!nouveauNom.isEmpty()) {
-                    enregistrerDonnee("_nom", nouveauNom);
+                    enregistrerDonneeString("_nom", nouveauNom);
                 }
                 if (!nouveauPrenom.isEmpty()) {
-                    enregistrerDonnee("_prenom", nouveauPrenom);
+                    enregistrerDonneeString("_prenom", nouveauPrenom);
                 }
-                if (!nouvelleActivite.isEmpty()) {
-                    enregistrerDonnee("_activite", nouvelleActivite);
+                if(nouvelAge != 0){
+                    enregistrerDonneeInt("_age", nouvelAge);
                 }
-
 
                 //Aller à l'activité Account
                 Toast.makeText(Info.this, "Modifications enregistrées !", Toast.LENGTH_SHORT).show();
@@ -109,9 +117,15 @@ public class Info extends AppCompatActivity {
 
     }
 
-    //Fonction permettant de modifier une valeur donnée
-    public void enregistrerDonnee(String donnee, String valeur) {
-        String UserId = getUid();
-        mDatabase.child("users").child(UserId).child(donnee).setValue(valeur);
+    //Fonction permettant de modifier une valeur donnée (String)
+    public void enregistrerDonneeString(String donnee, String valeur) {
+        myRef.child(donnee).setValue(valeur);
     }
+
+    //Fonction permettant de modifier une valeur donnée (int)
+    public void enregistrerDonneeInt(String donnee, int valeur) {
+        myRef.child(donnee).setValue(valeur);
+    }
+
+
 }
