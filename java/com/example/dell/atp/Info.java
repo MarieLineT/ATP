@@ -7,9 +7,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,21 +21,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 import static com.example.dell.atp.Sign.getUid;
-import static java.util.Objects.isNull;
+
 
 public class Info extends AppCompatActivity {
-
-    //Déclaration viariables graphique
-    private EditText mNom, mPrenom, mAge, mPro;
-    private ProgressBar mProgressBar;
-    private Button mBtnModif;
-    private Spinner mActivite;
 
     //Déclaration DB
     FirebaseDatabase database;
     DatabaseReference myRef;
 
+    //Déclaration viariables graphique
+    private EditText mNom, mPrenom, mAge, mPro;
+    private ProgressBar mProgressBar;
+    private Button mBtnModif;
+    private RadioButton mRdBtnProfessionnel;
+
+    //Bouton retour téléphone
     private static long back_pressed;
     @Override
     public void onBackPressed(){
@@ -52,7 +56,7 @@ public class Info extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        //Instanciation BD
+        //Instanciation DB
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("users").child(getUid());
 
@@ -62,64 +66,63 @@ public class Info extends AppCompatActivity {
         mAge = findViewById(R.id.age);
         mProgressBar = findViewById(R.id.progressBar);
         mBtnModif = findViewById(R.id.btn_modif);
-        mActivite = findViewById(R.id.activite);
         mPro = findViewById(R.id.pro);
+        mRdBtnProfessionnel = findViewById(R.id.professionnel);
 
-        //Creation liste du Spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.activite_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mActivite.setAdapter(adapter);
-
-        mActivite.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        //Action radiobutton professionnel :
+        mRdBtnProfessionnel.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final String nouvelleActivite = (String)mActivite.getSelectedItem();
-                enregistrerDonneeString("_activite", nouvelleActivite);
-                if (nouvelleActivite != "Professionnel(le)") mPro.setVisibility(mPro.GONE);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mPro.setVisibility(isChecked ? View.VISIBLE : View.INVISIBLE);
             }
         });
 
+        //Action du clic sur bouton : enregistrer modifications
         mBtnModif.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 mProgressBar.setVisibility(View.VISIBLE);
 
-                //Enregistrer informations utilisateurs
-                String nouveauNom = mNom.getText().toString().trim();
-                String nouveauPrenom = mPrenom.getText().toString().trim();
-                int nouvelAge = Integer.parseInt(mAge.getText().toString().trim());
+                //Choix catégorie
+                boolean professionnel = mRdBtnProfessionnel.isChecked();
+                if(professionnel == true) enregistrerDonneeString("_activite", "professionnel(le)");
 
-                //Ajouter les valeurs à la BD
-                //Certains champs peuvent ne pas être remplis : comment le prendre en compte ?
-                //Peut pas créer une seule fonction : cas par cas
-                if (!nouveauNom.isEmpty()) {
-                    enregistrerDonneeString("_nom", nouveauNom);
+                //Enregistrer informations utilisateurs
+                //Si je les met tous : fonctionne
+                //Si age(int) + 1 des autres string : fonctionne
+                //Sinon : activité se ferme, trouver pourquoi !!
+                //Solution 1 : tout mettre en String : fonctionne pas
+                //Solution 2 : classer infos par infos : fonctionne pas
+                //Solution 3 : try/catch + boucle de if
+                //Solution 4 : else
+
+                int age = Integer.parseInt(mAge.getText().toString().trim());
+                //Convertir int age en String :
+                final String nouvelAge = String.valueOf(age);
+                final String nouveauPrenom = mPrenom.getText().toString().trim();
+                final String nouveauNom = mNom.getText().toString().trim();
+
+                try {
+                    if (!nouvelAge.isEmpty()) enregistrerDonneeString("_age", nouvelAge);
+                    if (!nouveauPrenom.isEmpty()) enregistrerDonneeString("_prenom", nouveauPrenom);
+                    else if(!nouveauNom.isEmpty()) enregistrerDonneeString("_nom", nouveauNom);
                 }
-                if (!nouveauPrenom.isEmpty()) {
-                    enregistrerDonneeString("_prenom", nouveauPrenom);
-                }
-                if(nouvelAge != 0){
-                    enregistrerDonneeInt("_age", nouvelAge);
+                catch (IllegalArgumentException e){
+                    throw new RuntimeException(e);
                 }
 
                 //Aller à l'activité Account
                 Toast.makeText(Info.this, "Modifications enregistrées !", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Info.this, Account.class));
-                finish();
             }
         });
 
     }
 
     //Fonction permettant de modifier une valeur donnée (String)
-    public void enregistrerDonneeString(String donnee, String valeur) {
-        myRef.child(donnee).setValue(valeur);
+    public void enregistrerDonneeString(String donnee, String value) {
+        myRef.child(donnee).setValue(value);
     }
 
     //Fonction permettant de modifier une valeur donnée (int)
