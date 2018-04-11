@@ -56,7 +56,6 @@ public class Recherche extends AppCompatActivity {
     private EditText mProfession, mNom, mMotsCle;
     private Button mRechercher;
     private ListView mListView;
-    private ProgressBar mProgress;
     private List<Item> items;
 
     final ArrayList<String> nomsUsers = new ArrayList<>();
@@ -77,69 +76,70 @@ public class Recherche extends AppCompatActivity {
         mMotsCle = findViewById(R.id.motscle);
         mListView = findViewById(R.id.listView);
         mRechercher = findViewById(R.id.btn_recherche);
-        mProgress = findViewById(R.id.progressBar);
-
-        items = new ArrayList<Item>();
-        ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
-        mListView.setAdapter(adapter);
-
-        /*TEST
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, nomsUsers);
-        mListView.setAdapter(arrayAdapter);
-
-        //TEST
-        /*List<Item> items = requete();
-        ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
-        mListView.setAdapter(adapter);*/
 
 
         mRechercher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //ProgressBar devient visible
-                mProgress.setVisibility(View.VISIBLE);
-
                 //Récupération donnée utlisateur
                 final String professionRecherche = mProfession.getText().toString().trim();
 
-                //Requête de récupération données DB
-                myRef.orderByChild("_prenom").addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                items = new ArrayList<Item>();
+                ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
+                mListView.setAdapter(adapter);
 
-                        //FAIRE REQUETE : Profession = donnée renseignée !!!
-                        User users = dataSnapshot.getValue(User.class);
-                        String prenom = users.get_prenom();
-                        String surnom = users.get_surnom();
-                        String profession = users.get_profession();
-                        if (prenom == null) items.add(new Item(surnom, profession));
-                        else items.add(new Item(prenom, profession));
+                //Générer Items
+                genererItems();
+            }
+        });
+    }
+    //Fonction requête de recherche
+    public void genererItems(){
 
-                    }
+        //Requête de récupération données DB
+        myRef.orderByChild("_nom").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //Récupérer attributs utilisateurs via classe User
+                User users = dataSnapshot.getValue(User.class);
+                //Récupérer les valeurs de ces attributs pour tous les utilisateurs
+                String prenom = users.get_prenom();
+                String surnom = users.get_surnom();
+                String profession = users.get_profession();
 
-                    }
+                items.add(new Item(prenom, profession));
 
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                /*Si valeur profession = valeur renseignée :
+                if (profession != professionRecherche) {
+                    if (prenom == null) items.add(new Item(surnom, profession));
+                    else items.add(new Item(prenom, profession));
+                }
+                //Indiquer que recherche n'a pas abouti
+                else items.add(new Item("profil", "inexistant"));*/
+            }
 
-                    }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
 
-                    }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "Echec de la recherche", databaseError.toException());
-                        Toast.makeText(Recherche.this, "Echec de la recherche",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "Echec de la recherche", databaseError.toException());
+                Toast.makeText(Recherche.this, "Echec de la recherche",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
