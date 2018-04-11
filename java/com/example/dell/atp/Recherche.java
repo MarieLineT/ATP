@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,13 +56,8 @@ public class Recherche extends AppCompatActivity {
     private EditText mProfession, mNom, mMotsCle;
     private Button mRechercher;
     private ListView mListView;
-    //Liste Test
-    private String[] prenoms = new String[]{
-            "Antoine", "Benoit", "Cyril", "David", "Eloise", "Florent",
-            "Gerard", "Hugo", "Ingrid", "Jonathan", "Kevin", "Logan",
-            "Mathieu", "Noemie", "Olivia", "Philippe", "Quentin", "Romain",
-            "Sophie", "Tristan", "Ulric", "Vincent", "Willy", "Xavier",
-            "Yann", "Zoé"};
+    private ProgressBar mProgress;
+    private List<Item> items;
 
     final ArrayList<String> nomsUsers = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
@@ -80,8 +76,14 @@ public class Recherche extends AppCompatActivity {
         mNom = findViewById(R.id.nom);
         mMotsCle = findViewById(R.id.motscle);
         mListView = findViewById(R.id.listView);
+        mRechercher = findViewById(R.id.btn_recherche);
+        mProgress = findViewById(R.id.progressBar);
 
-        //TEST
+        items = new ArrayList<Item>();
+        ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
+        mListView.setAdapter(adapter);
+
+        /*TEST
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, nomsUsers);
         mListView.setAdapter(arrayAdapter);
 
@@ -90,40 +92,55 @@ public class Recherche extends AppCompatActivity {
         ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
         mListView.setAdapter(adapter);*/
 
-        myRef.addChildEventListener(new ChildEventListener() {
+
+        mRechercher.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onClick(View v) {
 
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    //Récupérer getKey = "_nom" !!!
-                    //Toast.makeText(Recherche.this, "Nom : "+key, Toast.LENGTH_LONG).show();
-                    //if(nom == null) nomsUsers.add("Non renseigné");
-                    //else nomsUsers.add(nom);
-                }
-            }
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                //ProgressBar devient visible
+                mProgress.setVisibility(View.VISIBLE);
 
-            }
+                //Récupération donnée utlisateur
+                final String professionRecherche = mProfession.getText().toString().trim();
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                //Requête de récupération données DB
+                myRef.orderByChild("_prenom").addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-            }
+                        //FAIRE REQUETE : Profession = donnée renseignée !!!
+                        User users = dataSnapshot.getValue(User.class);
+                        String prenom = users.get_prenom();
+                        String surnom = users.get_surnom();
+                        String profession = users.get_profession();
+                        if (prenom == null) items.add(new Item(surnom, profession));
+                        else items.add(new Item(prenom, profession));
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    }
 
-            }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "Echec de la recherche", databaseError.toException());
-                Toast.makeText(Recherche.this, "Echec de la recherche",
-                        Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(TAG, "Echec de la recherche", databaseError.toException());
+                        Toast.makeText(Recherche.this, "Echec de la recherche",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
-
     }
-
 }
