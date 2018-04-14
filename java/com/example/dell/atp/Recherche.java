@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -72,30 +73,35 @@ public class Recherche extends AppCompatActivity {
 
         //Référencement des éléments graphiques
         mProfession = findViewById(R.id.profession);
-        mNom = findViewById(R.id.nom);
+        mNom = findViewById(R.id.nomR);
         mMotsCle = findViewById(R.id.motscle);
         mListView = findViewById(R.id.listView);
-        mRechercher = findViewById(R.id.btn_recherche);
+        mRechercher = findViewById(R.id.btn_rechercher);
 
+        items = new ArrayList<Item>();
 
         mRechercher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
+
                 //Récupération donnée utlisateur
                 final String professionRecherche = mProfession.getText().toString().trim();
-
-                items = new ArrayList<Item>();
-                ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
-                mListView.setAdapter(adapter);
+                final String nomRecherche = mNom.getText().toString().trim();
+                final String motscleRecherche = mMotsCle.getText().toString().trim();
 
                 //Générer Items
-                genererItems();
+                genererItems(nomRecherche, professionRecherche, motscleRecherche);
+
+                mListView.setAdapter(adapter);
             }
         });
+
     }
     //Fonction requête de recherche
-    public void genererItems(){
+    public void genererItems(final String nomRecherche, final String professionRecherche,
+                             final String motscleRecherche){
 
         //Requête de récupération données DB
         myRef.orderByChild("_nom").addChildEventListener(new ChildEventListener() {
@@ -104,20 +110,32 @@ public class Recherche extends AppCompatActivity {
 
                 //Récupérer attributs utilisateurs via classe User
                 User users = dataSnapshot.getValue(User.class);
+
                 //Récupérer les valeurs de ces attributs pour tous les utilisateurs
-                String prenom = users.get_prenom();
+                //Les passer en minuscule
+                String nom = users.get_nom();
                 String surnom = users.get_surnom();
                 String profession = users.get_profession();
+                String description = users.get_description();
 
-                items.add(new Item(prenom, profession));
+                try {
+                        if(!nomRecherche.isEmpty()) {
+                            boolean contient = verifString(nom, nomRecherche);
+                            if (contient) items.add(new Item(nom, profession, description));
+                            else {
+                                if (!professionRecherche.isEmpty()) {
+                                    boolean contientBis = verifString(profession, professionRecherche);
+                                    if (contientBis) items.add(new Item(nom, profession, description));
+                                }
+                                else {
+                                    boolean contientTer = verifString(description, motscleRecherche);
+                                    if(contientTer) items.add(new Item(nom, profession, description));
+                                }
+                            }
+                        }
 
-                /*Si valeur profession = valeur renseignée :
-                if (profession != professionRecherche) {
-                    if (prenom == null) items.add(new Item(surnom, profession));
-                    else items.add(new Item(prenom, profession));
-                }
-                //Indiquer que recherche n'a pas abouti
-                else items.add(new Item("profil", "inexistant"));*/
+                }catch(Exception e){}
+
             }
 
             @Override
@@ -142,5 +160,20 @@ public class Recherche extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //Fonction permettant de vérifier que la donnée de la base (data) contient tout
+    //ou partie de l'information renseignée par l'utilisateur (renseigne)
+    public boolean verifString(String data, String renseigne){
+
+        //Mettre les String en minuscule
+        data = data.toLowerCase();
+        renseigne = renseigne.toLowerCase();
+
+        //Vérifier si data contient le renseignement
+        boolean contient = data.contains(renseigne);
+
+        //True = contient, false = ne contient pas
+        return contient;
     }
 }
