@@ -1,14 +1,17 @@
 package com.example.dell.atp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -60,7 +64,6 @@ public class Recherche extends AppCompatActivity {
     private List<Item> items;
 
     final ArrayList<String> nomsUsers = new ArrayList<>();
-    ArrayAdapter<String> arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +83,14 @@ public class Recherche extends AppCompatActivity {
 
         items = new ArrayList<Item>();
 
+
         mRechercher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
+                //Réinitialiser ArrayList pour ne pas que la ListView
+                //n'affiche plusieurs fois le contenu à chaque click
+                items.clear();
 
                 //Récupération donnée utlisateur
                 final String professionRecherche = mProfession.getText().toString().trim();
@@ -94,9 +100,31 @@ public class Recherche extends AppCompatActivity {
                 //Générer Items
                 genererItems(nomRecherche, professionRecherche, motscleRecherche);
 
-                mListView.setAdapter(adapter);
             }
         });
+
+        //Ouverture boite de dialogue en cliquant sur un item
+        //Redirection vers message
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                new AlertDialog.Builder(Recherche.this)
+                        .setTitle("Contacter...")
+                        .setMessage("Envoyer un message à "+items.get(position).get_pseudo()+" ?")
+                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface arg0, int arg1) {
+                                startActivity(new Intent(Recherche.this, Account.class));
+                                finish();
+                            }
+                        }).create().show();
+
+                return true;
+
+                }
+            });
 
     }
     //Fonction requête de recherche
@@ -119,23 +147,26 @@ public class Recherche extends AppCompatActivity {
                 String description = users.get_description();
 
                 try {
-                        if(!nomRecherche.isEmpty()) {
-                            boolean contient = verifString(nom, nomRecherche);
-                            if (contient) items.add(new Item(nom, profession, description));
-                            else {
-                                if (!professionRecherche.isEmpty()) {
-                                    boolean contientBis = verifString(profession, professionRecherche);
-                                    if (contientBis) items.add(new Item(nom, profession, description));
-                                }
-                                else {
-                                    boolean contientTer = verifString(description, motscleRecherche);
-                                    if(contientTer) items.add(new Item(nom, profession, description));
-                                }
-                            }
+                    //Si utilisateur a renseigné le nom
+                    if(!nomRecherche.isEmpty()) {
+                        boolean contient = verifString(nom, nomRecherche);
+                        if (contient) items.add(new Item(nom, profession, description));
+                    }
+                    else if(!professionRecherche.isEmpty()) {
+                        boolean contientBis = verifString(profession, professionRecherche);
+                        if (contientBis) items.add(new Item(nom, profession, description));
                         }
-
+                    else if (!motscleRecherche.isEmpty()){
+                        boolean contientTer = verifString(description, motscleRecherche);
+                        if(contientTer) items.add(new Item(nom, profession, description));
+                    }
+                    else{
+                        Toast.makeText(Recherche.this, "Aucun champ n'a été renseigné.", Toast.LENGTH_SHORT).show();
+                    }
                 }catch(Exception e){}
 
+                ItemAdapter adapter = new ItemAdapter(Recherche.this, items);
+                mListView.setAdapter(adapter);
             }
 
             @Override
