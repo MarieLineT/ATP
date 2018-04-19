@@ -1,39 +1,30 @@
-package com.example.dell.atp;
+package com.example.dell.atp.Activite;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.dell.atp.Classe.Item;
+import com.example.dell.atp.Classe.ItemAdapter;
+import com.example.dell.atp.Classe.User;
+import com.example.dell.atp.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.dell.atp.Sign.getUid;
 
 public class Recherche extends AppCompatActivity {
 
@@ -116,7 +107,10 @@ public class Recherche extends AppCompatActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                             public void onClick(DialogInterface arg0, int arg1) {
-                                startActivity(new Intent(Recherche.this, Account.class));
+
+                                //Créer ici nouvelle conversation ?
+
+                                startActivity(new Intent(Recherche.this, Chat.class));
                                 finish();
                             }
                         }).create().show();
@@ -140,11 +134,11 @@ public class Recherche extends AppCompatActivity {
                 User users = dataSnapshot.getValue(User.class);
 
                 //Récupérer les valeurs de ces attributs pour tous les utilisateurs
-                //Les passer en minuscule
                 String nom = users.get_nom();
                 String surnom = users.get_surnom();
                 String profession = users.get_profession();
                 String description = users.get_description();
+                String userID = myRef.getKey();
 
                 try {
                     //Si utilisateur a renseigné le nom
@@ -152,16 +146,20 @@ public class Recherche extends AppCompatActivity {
                         boolean contient = verifString(nom, nomRecherche);
                         if (contient) items.add(new Item(nom, profession, description));
                     }
-                    else if(!professionRecherche.isEmpty()) {
+                    //Profession renseignée
+                    if(!professionRecherche.isEmpty()) {
                         boolean contientBis = verifString(profession, professionRecherche);
                         if (contientBis) items.add(new Item(nom, profession, description));
                         }
-                    else if (!motscleRecherche.isEmpty()){
+                    //Mot clé renseigné
+                    if (!motscleRecherche.isEmpty()){
                         boolean contientTer = verifString(description, motscleRecherche);
                         if(contientTer) items.add(new Item(nom, profession, description));
                     }
-                    else{
-                        Toast.makeText(Recherche.this, "Aucun champ n'a été renseigné.", Toast.LENGTH_SHORT).show();
+                    //Si aucun champ n'a été renseigné
+                    else if (nomRecherche.isEmpty() && motscleRecherche.isEmpty() && professionRecherche.isEmpty()){
+                        Toast.makeText(Recherche.this, "Aucun champ n'a été renseigné.",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }catch(Exception e){}
 
