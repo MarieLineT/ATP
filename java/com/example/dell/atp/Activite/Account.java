@@ -168,7 +168,7 @@ public class Account extends AppCompatActivity {
                     final String profession = dataSnapshot.child(Sign.getUid()).child("_profession").getValue(String.class);
 
                 //Si activité = "professionnel(le)" et profession existe :
-                if(activite.isEmpty() && activite.equals("professionnel(le)") && profession != null)
+                if(!activite.isEmpty() && activite.equals("professionnel(le)") && profession != null)
                     mtextViewActiviteRenseigne.setText(profession);
 
                 //Sinon :

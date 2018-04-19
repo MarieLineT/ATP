@@ -40,5 +40,14 @@
     <string name="age">Age</string>
     <string name="genre">Genre</string>
     <string name="description">Description</string>
+    <string-array name="activite_array">
+        <item>Professionnel(le)</item>
+        <item>Particulier</item>
+    </string-array>
+    <string name="title_activity_recherche">Recherche</string>
+    <string name="title_activity_conversation">Conversation</string>
+    <string name="title_activity_chat">Chat</string>
 </resources>
+
+
 

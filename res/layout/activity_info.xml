@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.dell.atp.Info"
-    android:orientation="vertical">
+    tools:context="com.example.dell.atp.Activite.Info"
+    android:orientation="vertical"
+    android:scrollbars="vertical">
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -16,9 +23,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
+                android:textSize="15dp"
                 android:hint="Nom"
                 android:inputType="text"
-                android:maxLength="1"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:textColor="@color/bg_register"
                 android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
@@ -32,9 +41,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
+                android:textSize="15dp"
                 android:hint="Prénom"
+                android:singleLine="true"
                 android:inputType="text"
-                android:maxLength="1"
+                android:maxLines="1"
                 android:textColor="@color/bg_register"
                 android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
@@ -48,26 +59,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
+                android:textSize="15dp"
                 android:hint="Age"
                 android:inputType="number"
-                android:maxLength="1"
+                android:maxLength="2"
                 android:textColor="@color/bg_register"
                 android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:hintTextAppearance="@style/TextAppearance.AppCompat">
+        android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/activite"
+        <TextView
+            android:id="@+id/textViewProfessionnel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="15dp"
+            android:text="Professionnel(le) : "
+            android:textColor="@color/bg_register"
+            android:textSize="15dp" />
+
+        <CheckBox
+            android:id="@+id/professionnel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp" />
+
+
+        <EditText
+            android:id="@+id/pro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            android:hint="Activité" />
+            android:textSize="15dp"
+            android:hint="Profession"
+            android:visibility="gone"/>
 
-    </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -78,9 +111,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:hint="Description"
+                android:textSize="15dp"
+                android:hint="Decrivez votre objectif en quelques lignes..."
                 android:inputType="text"
-                android:maxLength="3"
+                android:maxLines="3"
                 android:textColor="@color/bg_register"
                 android:textColorLink="@color/bg_register" />
         </android.support.design.widget.TextInputLayout>
@@ -103,9 +137,13 @@
             android:id="@+id/btn_modif"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#FFCA28"
             android:layout_gravity="bottom"
             android:layout_weight="2"
             android:text="Modifier" />
     </LinearLayout>
 
 </LinearLayout>
+
+</ScrollView>

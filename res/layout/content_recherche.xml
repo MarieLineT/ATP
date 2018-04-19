@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.dell.atp.Activite.Sign"
-    tools:showIn="@layout/activity_sign">
+    tools:context="com.example.dell.atp.Activite.Recherche"
+    tools:showIn="@layout/activity_recherche">
 
 </android.support.constraint.ConstraintLayout>

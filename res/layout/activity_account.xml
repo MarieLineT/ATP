@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,7 +9,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:scrollbars="vertical"
-    tools:context="com.example.dell.atp.Account">
+    tools:context="com.example.dell.atp.Activite.Account">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -75,7 +77,7 @@
             android:textSize="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Non renseigné"
+            android:text=" "
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
@@ -100,7 +102,7 @@
             android:textSize="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Non renseigné"
+            android:text=" "
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
@@ -125,7 +127,7 @@
             android:textSize="18dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" yop "
+            android:text=" "
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
@@ -142,16 +144,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:text=" yop "
+            android:text=" Pas de description "
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_gravity="bottom">
-
         <Button
             android:id="@+id/btn_tchat"
             android:layout_width="match_parent"
@@ -161,9 +156,9 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             android:text="Chat"
-            android:textStyle="bold"
+            android:layout_gravity="bottom"
             />
-    </LinearLayout>
 </LinearLayout>
+
 
 

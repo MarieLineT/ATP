@@ -2,10 +2,10 @@
 <resources>
     <color name="colorPrimary">#00bcd4</color>
     <color name="colorPrimaryDark">#0097a7</color>
-    <color name="colorAccent">#49ffaa</color>
+    <color name="colorAccent">#757575</color>
 
     <color name="bg_login">#26ae90</color>
-    <color name="bg_register">#3d4146</color>
+    <color name="bg_register">#333333</color>
     <color name="bg_main">#ffef73</color>
     <color name="white">#ff9293</color>
     <color name="input_login">#ffffff</color>
